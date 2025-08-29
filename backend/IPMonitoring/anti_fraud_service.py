@@ -579,7 +579,7 @@ def check_velocity():
 # Register Blueprints & Run App
 # ------------------------------
 
-app.register_blueprint(ip_checker_blueprint, url_prefix="/ip")
+app.register_blueprint(ip_checker_blueprint, url_prefix=" /ip")
 app.register_blueprint(moderation_blueprint, url_prefix="/moderation")
 app.register_blueprint(wallet_blueprint, url_prefix="/wallet")
 
