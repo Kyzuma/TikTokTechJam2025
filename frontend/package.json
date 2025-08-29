@@ -11,7 +11,9 @@
   "dependencies": {
     "@lynx-js/react": "^0.112.4",
     "@lynx-js/web-core": "^0.15.7",
-    "@lynx-js/web-elements": "^0.8.4"
+    "@lynx-js/web-elements": "^0.8.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@lynx-js/preact-devtools": "^5.0.1-6664329",
