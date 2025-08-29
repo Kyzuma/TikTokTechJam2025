@@ -1,0 +1,6 @@
+flask
+flask-cors
+supabase
+dotenv
+flasgger
+geoip2
