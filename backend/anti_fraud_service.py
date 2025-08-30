@@ -240,7 +240,7 @@ def get_user_profiles():
                 type: integer
     """
     # Fetch all user profiles from Supabase
-    result = supabase.table("user_profile").select("*").execute()
+    result = supabase.table("user_profiles").select("*").execute()
     data = result.data if result.data else []
 
     return jsonify(data)
@@ -275,7 +275,7 @@ def get_trust_logs():
                 format: date-time
     """
     # Fetch all trust logs from Supabase
-    result = supabase.table("trust_log").select("*").execute()
+    result = supabase.table("trust_logs").select("*").execute()
     data = result.data if result.data else []
 
     return jsonify(data)
