@@ -1,15 +1,57 @@
 // src/components/ipLogsComp.jsx
 import { useEffect, useMemo, useState } from "@lynx-js/react";
-
-const DEFAULT_BASE = "http://localhost:8080";
-const API_BASE = DEFAULT_BASE;
+import { API_BASE } from "../App";
 
 export default function IpLogsComp() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [search, setSearch] = useState("");
   const [suspicious, setSuspicious] = useState("all"); // "all" | "true" | "false"
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  // Filter dropdown state
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+
+  // Auto-clear timers for banners
+  const errorTimeoutRef = useState(null);
+  const successTimeoutRef = useState(null);
+
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = setTimeout(() => {
+        setError(null);
+      }, 5000);
+    }
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [error]);
+
+  // Auto-clear success after 3 seconds
+  useEffect(() => {
+    if (success) {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+      successTimeoutRef.current = setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+    }
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, [success]);
 
   const apiUrl = useMemo(() => {
     const url = new URL("/ip/ip_logs", API_BASE);
@@ -28,7 +70,7 @@ export default function IpLogsComp() {
       const data = await res.json();
       setRows(data ?? []);
     } catch (e) {
-      if (e.name === 'AbortError') return;
+      if (e.name === "AbortError") return;
       setError(`Request failed: ${e.message}`);
     } finally {
       setLoading(false);
@@ -44,15 +86,16 @@ export default function IpLogsComp() {
   const markSafe = async (logId) => {
     try {
       const res = await fetch(`${API_BASE}/ip/mark_safe/${logId}`, {
-        method: 'PUT',
+        method: "PUT",
       });
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
+      setSuccess(`IP log ${logId} marked as safe successfully.`);
       // Refresh logs after marking safe
       fetchLogs();
     } catch (e) {
-      alert(`Failed to mark safe (ID: ${logId}) → ${e.message}`);
+      setError(`Failed to mark safe (ID: ${logId}) → ${e.message}`);
     }
   };
 
@@ -60,138 +103,336 @@ export default function IpLogsComp() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter((r) => {
-      const hay = `${r.id} ${r.user_id} ${r.ip_address} ${r.country ?? ""} ${r.region ?? ""} ${r.city ?? ""} ${r.remarks ?? ""}`.toLowerCase();
+      const hay = `${r.id} ${r.user_id} ${r.ip_address} ${r.country ?? ""} ${
+        r.region ?? ""
+      } ${r.city ?? ""} ${r.remarks ?? ""}`.toLowerCase();
       return hay.includes(q);
     });
   }, [rows, search]);
 
+  const handleSearchInput = (e) => {
+    setSearch(e.detail.value);
+  };
+
+  const handleFilterSelect = (filterValue) => {
+    setSuspicious(filterValue);
+    setFilterDropdownOpen(false);
+  };
+
+  const getFilterDisplayText = () => {
+    switch (suspicious) {
+      case "all":
+        return "All";
+      case "true":
+        return "Suspicious only";
+      case "false":
+        return "Non-suspicious";
+      default:
+        return "All";
+    }
+  };
+
+  const formatWhen = (iso) => {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleString();
+    } catch {
+      return iso;
+    }
+  };
+
+  const handleRowClick = (row) => {
+    console.log('IP Row clicked:', row);
+    setSelectedRow(row);
+    setShowDetail(true);
+  };
+
+  const closeDetail = (e) => {
+    // Only close if clicking the overlay, not the modal content
+    if (e.target.className === "logs-modal-overlay") {
+      setShowDetail(false);
+      setSelectedRow(null);
+    }
+  };
+
   return (
-    <view className="ip-logs-container">
-      {/* Controls */}
-      <view className="ip-logs-controls">
-        <view className="ip-logs-controls-left">
-          <text className="ip-logs-label">Show:</text>
-          <picker
-            value={suspicious}
-            bindchange={(e) => setSuspicious(e.detail.value)}
-            className="ip-logs-picker"
-          >
-            <picker-view-column>
-              <view value="all">All</view>
-              <view value="true">Suspicious only</view>
-              <view value="false">Non-suspicious</view>
-            </picker-view-column>
-          </picker>
+    <view className="logs-container">
+      {/* Title row */}
+      <view className="logs-header">
+        <text className="logs-subtitle">IP Access Logs</text>
+      </view>
+
+      {/* Controls row */}
+      <view className="logs-controls">
+        <view className="logs-filter">
+          <text className="logs-label">Show:</text>
+          <view className="logs-picker-container">
+            <view
+              className="logs-picker"
+              bindtap={() => setFilterDropdownOpen(!filterDropdownOpen)}
+            >
+              <view className="logs-picker-display">
+                <text className="logs-picker-text">
+                  {getFilterDisplayText()}
+                </text>
+                <text className="logs-picker-arrow">▼</text>
+              </view>
+            </view>
+
+            {filterDropdownOpen && (
+              <view className="logs-filter-dropdown">
+                <text
+                  className={`logs-filter-option ${
+                    suspicious === "all" ? "active" : ""
+                  }`}
+                  bindtap={() => handleFilterSelect("all")}
+                >
+                  All
+                </text>
+                <text
+                  className={`logs-filter-option ${
+                    suspicious === "true" ? "active" : ""
+                  }`}
+                  bindtap={() => handleFilterSelect("true")}
+                >
+                  Suspicious only
+                </text>
+                <text
+                  className={`logs-filter-option ${
+                    suspicious === "false" ? "active" : ""
+                  }`}
+                  bindtap={() => handleFilterSelect("false")}
+                >
+                  Non-suspicious
+                </text>
+              </view>
+            )}
+          </view>
         </view>
 
-        <view className="ip-logs-controls-right">
+        <view className="logs-search">
           <input
-            type="text"
             placeholder="Search IP / user / country / remarks..."
             value={search}
-            bindinput={(e) => setSearch(e.detail.value)}
-            className="ip-logs-search-input"
+            bindinput={handleSearchInput}
+            className="logs-search-input"
           />
         </view>
       </view>
 
-      {/* Error/Loading */}
+      {/* Status banners */}
       {error && (
-        <view className="ip-logs-error">
-          <text>{error}</text>
+        <view className="logs-error">
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{error}</text>
+            <text className="logs-banner-close" bindtap={() => setError(null)}>
+              ✕
+            </text>
+          </view>
+        </view>
+      )}
+      {success && (
+        <view className="logs-success">
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{success}</text>
+            <text
+              className="logs-banner-close"
+              bindtap={() => setSuccess(null)}
+            >
+              ✕
+            </text>
+          </view>
         </view>
       )}
       {loading && !rows.length && (
-        <view className="ip-logs-loading">
+        <view className="logs-loading">
           <text>Loading IP logs…</text>
         </view>
       )}
 
       {/* Table */}
-      <scroll-view className="ip-logs-table-container" scroll-x>
-        <view className="ip-logs-table">
-          {/* Table Header */}
-          <view className="ip-logs-header">
-            <text className="ip-logs-header-cell ip-logs-col-id">ID</text>
-            <text className="ip-logs-header-cell ip-logs-col-checked">Checked at</text>
-            <text className="ip-logs-header-cell ip-logs-col-user">User</text>
-            <text className="ip-logs-header-cell ip-logs-col-ip">IP</text>
-            <text className="ip-logs-header-cell ip-logs-col-geo">Geo</text>
-            <text className="ip-logs-header-cell ip-logs-col-coords">Lat/Lng</text>
-            <text className="ip-logs-header-cell ip-logs-col-status">Status</text>
-            <text className="ip-logs-header-cell ip-logs-col-remarks">Remarks</text>
-            <text className="ip-logs-header-cell ip-logs-col-action">Action</text>
+      <view className="logs-table-container">
+        <view className="logs-table">
+          <view className="logs-table-header">
+            <text className="logs-th">ID</text>
+            <text className="logs-th">Checked at</text>
+            <text className="logs-th">User</text>
+            <text className="logs-th">IP Address</text>
+            <text className="logs-th">Location</text>
+            <text className="logs-th">Status</text>
+            <text className="logs-th">Action</text>
           </view>
-          
-          {/* Table Body */}
-          {filtered.length === 0 ? (
-            <view className="ip-logs-no-data">
-              <text>{loading ? "Loading…" : "No IP logs found."}</text>
+
+          <scroll-view
+            className="logs-table-scroll"
+            scroll-y="true"
+            style="max-height: 400px;"
+          >
+            <view className="logs-table-body">
+              {filtered.length === 0 ? (
+                <view className="logs-no-data">
+                  <text>{loading ? "Loading…" : "No IP logs found."}</text>
+                </view>
+              ) : (
+                filtered.map((r) => (
+                  <view
+                    key={r.id}
+                    className="logs-row logs-row-clickable"
+                  >
+                    <text 
+                      className="logs-td logs-id"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.id}
+                    </text>
+                    <text 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {formatWhen(r.checked_at)}
+                    </text>
+                    <text 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.user_id}
+                    </text>
+                    <text 
+                      className="logs-td logs-id"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.ip_address}
+                    </text>
+                    <text 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {[r.city, r.region, r.country]
+                        .filter(Boolean)
+                        .join(", ") || "—"}
+                    </text>
+                    <view 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      <text
+                        className={`logs-status ${
+                          r.is_suspicious ? "logs-unresolved" : "logs-resolved"
+                        }`}
+                      >
+                        {r.is_suspicious ? "Suspicious" : "OK"}
+                      </text>
+                    </view>
+                    <view className="logs-td">
+                      {r.is_suspicious ? (
+                        <text
+                          bindtap={(e) => {
+                            e.stopPropagation(); // Prevent row click when clicking Mark Safe
+                            markSafe(r.id);
+                          }}
+                          className="ip-logs-mark-safe-button"
+                        >
+                          Mark Safe
+                        </text>
+                      ) : (
+                        <text className="logs-empty">—</text>
+                      )}
+                    </view>
+                  </view>
+                ))
+              )}
             </view>
-          ) : (
-            filtered.map((r, index) => (
-              <view key={r.id} className={`ip-logs-row ${index % 2 === 1 ? 'ip-logs-row-even' : ''}`}>
-                <text className="ip-logs-cell ip-logs-col-id ip-logs-mono">{r.id}</text>
-                <text className="ip-logs-cell ip-logs-col-checked">{fmtDate(r.checked_at)}</text>
-                <text className="ip-logs-cell ip-logs-col-user">{r.user_id}</text>
-                <text className="ip-logs-cell ip-logs-col-ip ip-logs-mono">{r.ip_address}</text>
-                <text className="ip-logs-cell ip-logs-col-geo">
-                  {[r.city, r.region, r.country].filter(Boolean).join(", ") || "—"}
+          </scroll-view>
+        </view>
+      </view>
+
+      {/* Detail Modal */}
+      {showDetail && selectedRow && (
+        <view className="logs-modal-overlay" bindtap={() => setShowDetail(false)}>
+          <view className="logs-modal">
+            <view className="logs-modal-header">
+              <text className="logs-modal-title">
+                IP Access Details - Log ID #{selectedRow.id}
+              </text>
+            </view>
+
+            <view className="logs-modal-content">
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Log ID:</text>
+                <text className="logs-detail-value">{selectedRow.id}</text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Checked At:</text>
+                <text className="logs-detail-value">
+                  {formatWhen(selectedRow.checked_at)}
                 </text>
-                <text className="ip-logs-cell ip-logs-col-coords">
-                  {isNum(r.latitude) && isNum(r.longitude)
-                    ? `${r.latitude}, ${r.longitude}`
-                    : "—"}
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">User ID:</text>
+                <text className="logs-detail-value">{selectedRow.user_id}</text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">IP Address:</text>
+                <text className="logs-detail-value logs-id">
+                  {selectedRow.ip_address}
                 </text>
-                <view className="ip-logs-cell ip-logs-col-status">
-                  <text className={`ip-logs-status-badge ${
-                    r.is_suspicious
-                      ? "ip-logs-suspicious"
-                      : "ip-logs-safe"
-                  }`}>
-                    {r.is_suspicious ? "Suspicious" : "OK"}
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Location:</text>
+                <text className="logs-detail-value">
+                  {[selectedRow.city, selectedRow.region, selectedRow.country]
+                    .filter(Boolean)
+                    .join(", ") || "Unknown location"}
+                </text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Status:</text>
+                <view className="logs-detail-value">
+                  <text
+                    className={`logs-status ${
+                      selectedRow.is_suspicious
+                        ? "logs-unresolved"
+                        : "logs-resolved"
+                    }`}
+                  >
+                    {selectedRow.is_suspicious ? "Suspicious" : "OK"}
                   </text>
                 </view>
-                <text className="ip-logs-cell ip-logs-col-remarks">
-                  {r.remarks ? r.remarks : "—"}
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Remarks:</text>
+                <text className="logs-detail-value logs-detail-remarks">
+                  {selectedRow.remarks || "No remarks provided"}
                 </text>
-                <view className="ip-logs-cell ip-logs-col-action">
-                  {r.is_suspicious ? (
+              </view>
+
+              {selectedRow.is_suspicious && (
+                <view className="logs-detail-section">
+                  <text className="logs-detail-label">Action:</text>
+                  <view className="logs-detail-value">
                     <text
-                      bindtap={() => markSafe(r.id)}
+                      bindtap={() => {
+                        markSafe(selectedRow.id);
+                        setShowDetail(false);
+                      }}
                       className="ip-logs-mark-safe-button"
                     >
-                      Mark Safe
+                      Mark as Safe
                     </text>
-                  ) : (
-                    <text className="ip-logs-no-action">—</text>
-                  )}
+                  </view>
                 </view>
-              </view>
-            ))
-          )}
+              )}
+            </view>
+          </view>
         </view>
-      </scroll-view>
-
-      <view className="ip-logs-api-info">
-        <text>API: </text>
-        <text className="ip-logs-api-url">{API_BASE}/ip/ip_logs</text>
-      </view>
+      )}
     </view>
   );
-}
-
-// helpers
-function fmtDate(iso) {
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleString();
-  } catch {
-    return iso;
-  }
-}
-
-function isNum(v) {
-  return typeof v === "number" && Number.isFinite(v);
 }

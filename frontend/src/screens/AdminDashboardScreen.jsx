@@ -20,16 +20,17 @@ export function AdminDashboardScreen({ setActiveTab }) {
 
       <view className="ao-stack">
         {/* Transactions Widget */}
-        <view className="ao-widget" bindtap={() => handleWidgetClick('Transactions')}>
+        <view
+          className="ao-widget"
+          bindtap={() => handleWidgetClick("Transactions")}
+        >
           <view className="ao-left">
             <view className="ao-icon">
               <text>💳</text>
             </view>
             <view>
               <text className="ao-title">Transactions</text>
-              <text className="ao-sub">
-                View transactions and status
-              </text>
+              <text className="ao-sub">View transactions and status</text>
             </view>
           </view>
           <view className="ao-chevron">
@@ -38,16 +39,14 @@ export function AdminDashboardScreen({ setActiveTab }) {
         </view>
 
         {/* Logs History Widget */}
-        <view className="ao-widget" bindtap={() => handleWidgetClick('Logs')}>
+        <view className="ao-widget" bindtap={() => handleWidgetClick("Logs")}>
           <view className="ao-left">
             <view className="ao-icon">
               <text>📜</text>
             </view>
             <view>
               <text className="ao-title">Logs History</text>
-              <text className="ao-sub">
-                Browse logs: trust logs, ip logs
-              </text>
+              <text className="ao-sub">Browse logs: trust logs, ip logs</text>
             </view>
           </view>
           <view className="ao-chevron">
@@ -56,16 +55,14 @@ export function AdminDashboardScreen({ setActiveTab }) {
         </view>
 
         {/* Manage Users Widget */}
-        <view className="ao-widget" bindtap={() => handleWidgetClick('Users')}>
+        <view className="ao-widget" bindtap={() => handleWidgetClick("Users")}>
           <view className="ao-left">
             <view className="ao-icon">
               <text>👤</text>
             </view>
             <view>
               <text className="ao-title">Manage Users</text>
-              <text className="ao-sub">
-                Browse logs: user profiles
-              </text>
+              <text className="ao-sub">Browse logs: user profiles</text>
             </view>
           </view>
           <view className="ao-chevron">

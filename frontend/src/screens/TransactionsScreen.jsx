@@ -1,6 +1,4 @@
-
-
-import { useEffect, useMemo, useRef, useState } from "@lynx-js/react";
+import { useEffect, useMemo, useState } from "@lynx-js/react";
 
 export function TransactionsScreen() {
   const [data, setData] = useState([]);
@@ -12,17 +10,17 @@ export function TransactionsScreen() {
 
   // Menu state
   const [menuOpen, setMenuOpen] = useState(false);
-  
+
   // Detail modal state
   const [selectedRow, setSelectedRow] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
-  
+
   // Filter dropdown state
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
   // Auto-clear timers for banners
-  const errorTimeoutRef = useRef(null);
-  const successTimeoutRef = useRef(null);
+  const errorTimeoutRef = useState(null);
+  const successTimeoutRef = useState(null);
 
   // Auto-clear error after 5 seconds
   useEffect(() => {
@@ -219,9 +217,9 @@ export function TransactionsScreen() {
     const selectedIndex = e.detail.value;
     // Map picker index to filter values
     const filterMap = {
-      0: "all",        // All
-      1: "false",      // Unresolved only
-      2: "true"        // Resolved only
+      0: "all", // All
+      1: "false", // Unresolved only
+      2: "true", // Resolved only
     };
     setResolvedFilter(filterMap[selectedIndex] || "all");
   };
@@ -232,11 +230,15 @@ export function TransactionsScreen() {
   };
 
   const getFilterDisplayText = () => {
-    switch(resolvedFilter) {
-      case "all": return "All";
-      case "false": return "Unresolved only";
-      case "true": return "Resolved only";
-      default: return "All";
+    switch (resolvedFilter) {
+      case "all":
+        return "All";
+      case "false":
+        return "Unresolved only";
+      case "true":
+        return "Resolved only";
+      default:
+        return "All";
     }
   };
 
@@ -289,7 +291,7 @@ export function TransactionsScreen() {
         <view className="logs-filter">
           <text className="logs-label">Resolved status:</text>
           <view className="logs-picker-container">
-            <view 
+            <view
               className="logs-picker"
               bindtap={() => setFilterDropdownOpen(!filterDropdownOpen)}
             >
@@ -300,23 +302,29 @@ export function TransactionsScreen() {
                 <text className="logs-picker-arrow">▼</text>
               </view>
             </view>
-            
+
             {filterDropdownOpen && (
               <view className="logs-filter-dropdown">
-                <text 
-                  className={`logs-filter-option ${resolvedFilter === "all" ? "active" : ""}`}
+                <text
+                  className={`logs-filter-option ${
+                    resolvedFilter === "all" ? "active" : ""
+                  }`}
                   bindtap={() => handleFilterSelect("all")}
                 >
                   All
                 </text>
-                <text 
-                  className={`logs-filter-option ${resolvedFilter === "false" ? "active" : ""}`}
+                <text
+                  className={`logs-filter-option ${
+                    resolvedFilter === "false" ? "active" : ""
+                  }`}
                   bindtap={() => handleFilterSelect("false")}
                 >
                   Unresolved only
                 </text>
-                <text 
-                  className={`logs-filter-option ${resolvedFilter === "true" ? "active" : ""}`}
+                <text
+                  className={`logs-filter-option ${
+                    resolvedFilter === "true" ? "active" : ""
+                  }`}
                   bindtap={() => handleFilterSelect("true")}
                 >
                   Resolved only
@@ -351,7 +359,10 @@ export function TransactionsScreen() {
         <view className="logs-success">
           <view className="logs-banner-content">
             <text className="logs-banner-text">{success}</text>
-            <text className="logs-banner-close" bindtap={() => setSuccess(null)}>
+            <text
+              className="logs-banner-close"
+              bindtap={() => setSuccess(null)}
+            >
               ✕
             </text>
           </view>
@@ -374,8 +385,8 @@ export function TransactionsScreen() {
             <text className="logs-th">Reason</text>
           </view>
 
-          <scroll-view 
-            className="logs-table-scroll" 
+          <scroll-view
+            className="logs-table-scroll"
             scroll-y="true"
             style="max-height: 400px;"
           >
@@ -388,15 +399,17 @@ export function TransactionsScreen() {
                 </view>
               ) : (
                 filtered.map((row) => (
-                  <view 
-                    key={row.flagged_transaction_id} 
+                  <view
+                    key={row.flagged_transaction_id}
                     className="logs-row logs-row-clickable"
                     bindtap={() => handleRowClick(row)}
                   >
                     <text className="logs-td logs-id">
                       {row.flagged_transaction_id}
                     </text>
-                    <text className="logs-td">{formatWhen(row.created_at)}</text>
+                    <text className="logs-td">
+                      {formatWhen(row.created_at)}
+                    </text>
                     <view className="logs-td logs-tx-ids">
                       {row.transaction_ids.length === 0 ? (
                         <text className="logs-empty">—</text>
@@ -418,7 +431,11 @@ export function TransactionsScreen() {
                       </text>
                     </view>
                     <text className="logs-td logs-reason-preview">
-                      {row.reason ? (row.reason.length > 30 ? row.reason.substring(0, 30) + "..." : row.reason) : "—"}
+                      {row.reason
+                        ? row.reason.length > 30
+                          ? row.reason.substring(0, 30) + "..."
+                          : row.reason
+                        : "—"}
                     </text>
                   </view>
                 ))
@@ -434,28 +451,39 @@ export function TransactionsScreen() {
           <view className="logs-modal">
             <view className="logs-modal-header">
               <text className="logs-modal-title">
-                Transaction Details - Flag ID #{selectedRow.flagged_transaction_id}
+                Transaction Details - Flag ID #
+                {selectedRow.flagged_transaction_id}
               </text>
             </view>
-            
+
             <view className="logs-modal-content">
               <view className="logs-detail-section">
                 <text className="logs-detail-label">Flag ID:</text>
-                <text className="logs-detail-value">{selectedRow.flagged_transaction_id}</text>
+                <text className="logs-detail-value">
+                  {selectedRow.flagged_transaction_id}
+                </text>
               </view>
-              
+
               <view className="logs-detail-section">
                 <text className="logs-detail-label">Created:</text>
-                <text className="logs-detail-value">{formatWhen(selectedRow.created_at)}</text>
+                <text className="logs-detail-value">
+                  {formatWhen(selectedRow.created_at)}
+                </text>
               </view>
-              
+
               <view className="logs-detail-section">
                 <text className="logs-detail-label">Status:</text>
-                <text className={`logs-status ${selectedRow.is_resolved ? 'logs-resolved' : 'logs-unresolved'}`}>
+                <text
+                  className={`logs-status ${
+                    selectedRow.is_resolved
+                      ? "logs-resolved"
+                      : "logs-unresolved"
+                  }`}
+                >
                   {selectedRow.is_resolved ? "Resolved" : "Unresolved"}
                 </text>
               </view>
-              
+
               <view className="logs-detail-section">
                 <text className="logs-detail-label">Transaction IDs:</text>
                 <view className="logs-detail-tx-list">
@@ -470,7 +498,7 @@ export function TransactionsScreen() {
                   )}
                 </view>
               </view>
-              
+
               <view className="logs-detail-section logs-detail-reason">
                 <text className="logs-detail-label">Reason:</text>
                 <text className="logs-detail-value logs-reason-full">
@@ -483,4 +511,4 @@ export function TransactionsScreen() {
       )}
     </view>
   );
-};
+}

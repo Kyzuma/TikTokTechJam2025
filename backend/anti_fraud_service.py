@@ -37,7 +37,7 @@ swagger_template = {
 
 Swagger(app, template=swagger_template)
 CORS(app)
-geo_reader = geoip2.database.Reader("backend\GeoLite2-City.mmdb")
+geo_reader = geoip2.database.Reader("GeoLite2-City.mmdb")
 
 ip_blueprint = Blueprint("ip", __name__)
 user_profile_blueprint = Blueprint("user", __name__)

@@ -11,7 +11,7 @@ import { TransactionsScreen } from './screens/TransactionsScreen'
 import { LogsScreen } from './screens/LogsScreen'
 import { UserDataScreen } from './screens/UserDataScreen'
 
-export const API_BASE = "http://192.168.0.196:8080"; // change per machine
+export const API_BASE = "http://192.168.88.13:8080"; // change per machine
 
 export function App() {
   // State for navigation and role

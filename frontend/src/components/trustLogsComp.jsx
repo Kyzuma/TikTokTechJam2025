@@ -1,15 +1,54 @@
 // src/components/trustLogsComp.jsx
 import { useEffect, useMemo, useState } from "@lynx-js/react";
-
-const DEFAULT_BASE = "http://localhost:8080";
-const API_BASE = DEFAULT_BASE; // Since import.meta doesn't work in Lynx
+import { API_BASE } from '../App';
 
 export default function TrustLogsComp() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [search, setSearch] = useState("");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  // Auto-clear timers for banners
+  const errorTimeoutRef = useState(null);
+  const successTimeoutRef = useState(null);
+
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = setTimeout(() => {
+        setError(null);
+      }, 5000);
+    }
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [error]);
+
+  // Auto-clear success after 3 seconds
+  useEffect(() => {
+    if (success) {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+      successTimeoutRef.current = setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+    }
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, [success]);
 
   const apiUrl = `${API_BASE}/trust_log/trust_logs`;
 
@@ -58,18 +97,37 @@ export default function TrustLogsComp() {
     return data;
   }, [rows, search, sortNewestFirst]);
 
+  const handleSearchInput = (e) => {
+    setSearch(e.detail.value);
+  };
+
+  const formatWhen = (iso) => {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleString();
+    } catch {
+      return iso;
+    }
+  };
+
+  const handleRowClick = (row) => {
+    console.log('Row clicked:', row);
+    setSelectedRow(row);
+    setShowDetail(true);
+  };
+
   return (
-    <view className="trust-logs-container">
-      {/* Controls */}
-      <view className="trust-logs-controls">
-        <view className="trust-logs-controls-group">
-          <input
-            type="text"
-            placeholder="Search user / remarks..."
-            value={search}
-            bindinput={(e) => setSearch(e.detail.value)}
-            className="trust-logs-search-input"
-          />
+    <view className="logs-container">
+      {/* Title row */}
+      <view className="logs-header">
+        <text className="logs-subtitle">Trust Activity Logs</text>
+      </view>
+
+      {/* Controls row */}
+      <view className="logs-controls">
+        <view className="logs-filter">
+          <text className="logs-label">Sort:</text>
           <text
             bindtap={() => setSortNewestFirst((v) => !v)}
             className="trust-logs-sort-button"
@@ -77,79 +135,168 @@ export default function TrustLogsComp() {
             {sortNewestFirst ? "Newest → Oldest" : "Oldest → Newest"}
           </text>
         </view>
+
+        <view className="logs-search">
+          <input
+            placeholder="Search user / remarks..."
+            value={search}
+            bindinput={handleSearchInput}
+            className="logs-search-input"
+          />
+        </view>
       </view>
 
-      {/* Error/Loading */}
+      {/* Status banners */}
       {error && (
-        <view className="trust-logs-error">
-          <text>{error}</text>
+        <view className="logs-error">
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{error}</text>
+            <text className="logs-banner-close" bindtap={() => setError(null)}>
+              ✕
+            </text>
+          </view>
+        </view>
+      )}
+      {success && (
+        <view className="logs-success">
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{success}</text>
+            <text className="logs-banner-close" bindtap={() => setSuccess(null)}>
+              ✕
+            </text>
+          </view>
         </view>
       )}
       {loading && !rows.length && (
-        <view className="trust-logs-loading">
+        <view className="logs-loading">
           <text>Loading trust activity…</text>
         </view>
       )}
 
       {/* Table */}
-      <scroll-view className="trust-logs-table-container" scroll-x>
-        <view className="trust-logs-table">
-          {/* Table Header */}
-          <view className="trust-logs-header">
-            <text className="trust-logs-header-cell trust-logs-col-id">Log ID</text>
-            <text className="trust-logs-header-cell trust-logs-col-created">Created</text>
-            <text className="trust-logs-header-cell trust-logs-col-user">User ID</text>
-            <text className="trust-logs-header-cell trust-logs-col-trust">Δ Trust</text>
-            <text className="trust-logs-header-cell trust-logs-col-remarks">Remarks</text>
+      <view className="logs-table-container">
+        <view className="logs-table">
+          <view className="logs-table-header">
+            <text className="logs-th">Log ID</text>
+            <text className="logs-th">Created</text>
+            <text className="logs-th">User ID</text>
+            <text className="logs-th">Trust Change</text>
+            <text className="logs-th">Remarks</text>
           </view>
-          
-          {/* Table Body */}
-          {filtered.length === 0 ? (
-            <view className="trust-logs-no-data">
-              <text>{loading ? "Loading…" : "No trust logs found."}</text>
+
+          <scroll-view
+            className="logs-table-scroll"
+            scroll-y="true"
+            style="max-height: 400px;"
+          >
+            <view className="logs-table-body">
+              {filtered.length === 0 ? (
+                <view className="logs-no-data">
+                  <text>{loading ? "Loading…" : "No trust logs found."}</text>
+                </view>
+              ) : (
+                filtered.map((r) => (
+                  <view 
+                    key={r.id} 
+                    className="logs-row logs-row-clickable"
+                  >
+                    <text 
+                      className="logs-td logs-id"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.id}
+                    </text>
+                    <text 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {formatWhen(r.created_at)}
+                    </text>
+                    <text 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.user_id}
+                    </text>
+                    <view 
+                      className="logs-td"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      <text className={`logs-status ${
+                        r.added_trust > 0
+                          ? "trust-logs-positive"
+                          : r.added_trust < 0
+                          ? "trust-logs-negative"
+                          : "trust-logs-neutral"
+                      }`}>
+                        {r.added_trust > 0 ? `+${r.added_trust}` : r.added_trust}
+                      </text>
+                    </view>
+                    <text 
+                      className="logs-td logs-reason-preview"
+                      bindtap={() => handleRowClick(r)}
+                    >
+                      {r.remarks ? (r.remarks.length > 30 ? r.remarks.substring(0, 30) + "..." : r.remarks) : "—"}
+                    </text>
+                  </view>
+                ))
+              )}
             </view>
-          ) : (
-            filtered.map((r, index) => (
-              <view key={r.id} className={`trust-logs-row ${index % 2 === 1 ? 'trust-logs-row-even' : ''}`}>
-                <text className="trust-logs-cell trust-logs-col-id trust-logs-mono">{r.id}</text>
-                <text className="trust-logs-cell trust-logs-col-created">{fmtDate(r.created_at)}</text>
-                <text className="trust-logs-cell trust-logs-col-user">{r.user_id}</text>
-                <view className="trust-logs-cell trust-logs-col-trust">
-                  <text className={`trust-logs-badge ${
-                    r.added_trust > 0
+          </scroll-view>
+        </view>
+      </view>
+
+      {/* Detail Modal */}
+      {showDetail && selectedRow && (
+        <view className="logs-modal-overlay" bindtap={() => setShowDetail(false)}>
+          <view className="logs-modal">
+            <view className="logs-modal-header">
+              <text className="logs-modal-title">
+                Trust Log Details - Log ID #{selectedRow.id}
+              </text>
+            </view>
+            
+            <view className="logs-modal-content">
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Log ID:</text>
+                <text className="logs-detail-value">{selectedRow.id}</text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Created:</text>
+                <text className="logs-detail-value">{formatWhen(selectedRow.created_at)}</text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">User ID:</text>
+                <text className="logs-detail-value">{selectedRow.user_id}</text>
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Trust Score Change:</text>
+                <view className="logs-detail-value">
+                  <text className={`logs-status ${
+                    selectedRow.added_trust > 0
                       ? "trust-logs-positive"
-                      : r.added_trust < 0
+                      : selectedRow.added_trust < 0
                       ? "trust-logs-negative"
                       : "trust-logs-neutral"
                   }`}>
-                    {r.added_trust > 0 ? `+${r.added_trust}` : r.added_trust}
+                    {selectedRow.added_trust > 0 ? `+${selectedRow.added_trust}` : selectedRow.added_trust}
                   </text>
                 </view>
-                <text className="trust-logs-cell trust-logs-col-remarks">
-                  {r.remarks || "—"}
+              </view>
+
+              <view className="logs-detail-section">
+                <text className="logs-detail-label">Remarks:</text>
+                <text className="logs-detail-value logs-detail-remarks">
+                  {selectedRow.remarks || "No remarks provided"}
                 </text>
               </view>
-            ))
-          )}
+            </view>
+          </view>
         </view>
-      </scroll-view>
-
-      {/* API hint */}
-      <view className="trust-logs-api-info">
-        <text>API: </text>
-        <text className="trust-logs-api-url">{API_BASE}/trust_log/trust_logs</text>
-      </view>
+      )}
     </view>
   );
-}
-
-// helpers
-function fmtDate(iso) {
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleString();
-  } catch {
-    return iso;
-  }
 }

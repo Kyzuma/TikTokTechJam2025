@@ -376,6 +376,7 @@
 /* Logs Screen Styles */
 .logs-container {
   padding: 20px;
+  padding-top: 0px;
   max-width: 1200px;
   margin: 0 auto;
   min-height: calc(100vh - 80px);
@@ -387,12 +388,6 @@
   align-items: center;
   margin-bottom: 20px;
   position: relative;
-}
-
-.logs-title {
-  font-size: 28px;
-  color: #fff;
-  margin-bottom: 0;
 }
 
 .logs-menu {
@@ -736,6 +731,7 @@
   min-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
 }
 
 .logs-td:first-child {
@@ -953,13 +949,25 @@
   line-height: 1.6;
 }
 
+.logs-detail-remarks {
+  background: #374151;
+  border-radius: 6px;
+  padding: 12px;
+  color: #E5E7EB;
+  line-height: 1.6;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
 /* LogsScreen Custom Styles */
 .logs-container {
   min-height: 100vh;
   width: 100%;
   max-width: 1024px;
   margin: 0 auto;
-  padding: 24px;
+  margin-left: 0px;
+  padding: 10px;
+  padding-top: 24px;
 }
 
 .logs-title {
@@ -1013,10 +1021,11 @@
 }
 
 .logs-subtitle {
-  color: #9CA3AF;
-  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0px;
   display: block;
-  font-size: 14px;
 }
 
 .logs-placeholder {
