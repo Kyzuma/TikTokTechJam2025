@@ -1,4 +1,3 @@
-import ipaddress
 import geoip2.database
 from flask import Blueprint, Flask, jsonify, request
 from flask_cors import CORS
@@ -7,10 +6,8 @@ from dotenv import load_dotenv
 import os
 from flasgger import Swagger
 from datetime import datetime, timedelta
-from collections import defaultdict, deque
-from typing import Any, Deque, Dict, Iterable, List, Optional, Tuple
-import json
-
+from collections import defaultdict
+from datetime import datetime, timezone
 # ------------------------------
 # Setup
 # ------------------------------
@@ -542,7 +539,7 @@ def check_transactions():
       Batch processing to check suspicious transactions:
       - Circular money flow between users A and B
       - Huge transaction amount way higher than trust limit
-      - Multiple pending transactions from user 7 to 3 within 30 mins
+      - Multiple pending transactions from user A to B within 30 mins
 
       Flagged transactions are saved into `flagged_transaction` table if not flagged before.
     tags:
@@ -566,14 +563,14 @@ def check_transactions():
     # 2️⃣ Get existing flagged transactions
     flagged = (
         supabase.table("flagged_transaction")
-        .select("*")
+        .select("transaction_ids")
         .gte("created_at", since.isoformat())
         .execute()
         .data
     )
     already_flagged_ids = set()
     for f in flagged:
-        already_flagged_ids.update(json.loads(f["transaction_ids"]))
+        already_flagged_ids.update(f["transaction_ids"])  # ✅ f["transaction_ids"] is already list[int]
 
     new_flags = []
 
@@ -585,12 +582,12 @@ def check_transactions():
         by_user_pairs.setdefault(key, []).append(tx)
 
     for pair, txs in by_user_pairs.items():
-        if len(txs) >= 4:  # simple threshold like sample (1->2->1 multiple times)
-            tx_ids = [str(tx["transaction_id"]) for tx in txs]
+        if len(txs) >= 4:  # simple threshold
+            tx_ids = [tx["transaction_id"] for tx in txs]
             if not set(tx_ids).intersection(already_flagged_ids):
                 new_flags.append(
                     {
-                        "transaction_ids": json.dumps(tx_ids),
+                        "transaction_ids": tx_ids,  # ✅ no json.dumps, since DB column is int8[]
                         "created_at": now.isoformat(),
                         "is_resolved": False,
                         "reason": f"Circular money flow between users {pair[0]} and {pair[1]}",
@@ -602,47 +599,57 @@ def check_transactions():
     user_limits = {str(p["user_id"]): p["transaction_limit"] for p in profiles}
 
     for tx in transactions:
-        tx_id = str(tx["transaction_id"])
+        tx_id = tx["transaction_id"]
         if tx_id in already_flagged_ids:
             continue
         limit = user_limits.get(str(tx["from_user_id"]), 1000)
-        if (
-            tx["amount"] > (limit * 10) or tx["amount"] > 1_000_000
-        ):  # arbitrary ridiculous threshold
+        if tx["amount"] > (limit * 10) or tx["amount"] > 1_000_000:
             new_flags.append(
                 {
-                    "transaction_ids": json.dumps([tx_id]),
+                    "transaction_ids": [tx_id],  # ✅ int list
                     "created_at": now.isoformat(),
                     "is_resolved": False,
                     "reason": f"Huge transaction amount ({tx['amount']})",
                 }
             )
 
-    # Rule C: Multiple pending transactions from 7 -> 3 within 30mins
-    pending_73 = [
-        tx
-        for tx in transactions
-        if tx["from_user_id"] == 7
-        and tx["to_user_id"] == 3
-        and tx["status"] == "pending"
-    ]
-    if len(pending_73) >= 5:
-        tx_ids = [str(tx["transaction_id"]) for tx in pending_73]
-        if not set(tx_ids).intersection(already_flagged_ids):
-            new_flags.append(
-                {
-                    "transaction_ids": json.dumps(tx_ids),
-                    "created_at": now.isoformat(),
+    # Rule C: Multiple pending transactions from User A -> User B within 30mins
+    grouped = defaultdict(list)
+    for tx in transactions:
+        if tx["status"] == "pending":
+            grouped[(tx["from_user_id"], tx["to_user_id"])].append(tx)
+
+    # 3️⃣ Check for >=5 pending within 30min
+    for (from_id, to_id), txs in grouped.items():
+        # sort by created_at
+        txs.sort(key=lambda x: datetime.fromisoformat(x["created_at"].replace("Z", "+00:00")))
+
+        # sliding window
+        window = []
+        for tx in txs:
+            created_at = datetime.fromisoformat(tx["created_at"].replace("Z", "+00:00"))
+            window = [w for w in window if (created_at - w).total_seconds() <= 1800]
+            window.append(created_at)
+
+            if len(window) >= 5:
+                # collect transaction_ids in this window
+                tx_ids = [str(t["transaction_id"]) for t in txs if datetime.fromisoformat(t["created_at"].replace("Z", "+00:00")) in window]
+
+                flagged.append({
+                    "created_at": created_at.isoformat(),
+                    "transaction_ids": tx_ids,   # int[] in Postgres
                     "is_resolved": False,
-                    "reason": "Multiple pending transactions from user 7 to 3",
-                }
-            )
+                    "reason": f"Multiple pending transactions from user {from_id} to {to_id}"
+                })
+                break  # stop after first flag for this pair
+
 
     # 4️⃣ Insert new flagged transactions
     if new_flags:
         supabase.table("flagged_transaction").insert(new_flags).execute()
 
     return jsonify({"message": "Executed successfully"})
+
 
 
 def calculate_transaction_limit(trust: int) -> int:
@@ -693,18 +700,14 @@ def recalc_trust_scores():
       500:
         description: Internal server error
     """
-    now = datetime.datetime.utcnow()
+    now = datetime.now(timezone.utc)
     users = supabase.table("user_profiles").select("*").execute().data
 
     for user in users:
         user_id = user["user_id"]
         trust = user["trust_score"]
-        last_login = datetime.datetime.fromisoformat(
-            user["last_login"].replace("Z", "+00:00")
-        )
-        created_at = datetime.datetime.fromisoformat(
-            user["created_at"].replace("Z", "+00:00")
-        )
+        last_login = datetime.fromisoformat(user["last_login"].replace("Z", "+00:00"))
+        created_at = datetime.fromisoformat(user["created_at"].replace("Z", "+00:00"))
 
         logs = (
             supabase.table("trust_logs")
@@ -756,6 +759,7 @@ def recalc_trust_scores():
                 "created_at": now.isoformat(),
             }
         ).execute()
+    return jsonify({"message": "Executed successfully"})
 
 
 @user_profile_blueprint.route("/verify", methods=["GET"])
@@ -806,8 +810,7 @@ def verify_user():
         description: Internal server error
     """
     user_id = request.args.get("user_id", type=int)
-    now = datetime.datetime.utcnow()
-
+    now = datetime.now(timezone.utc)
     # 1. Fetch user
     user = (
         supabase.table("user_profiles")
