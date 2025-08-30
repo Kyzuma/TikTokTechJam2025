@@ -375,11 +375,78 @@
 
 /* Logs Screen Styles */
 .logs-container {
-  padding: 20px;
-  padding-top: 0px;
+  min-height: 100vh;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  min-height: calc(100vh - 80px);
+  margin-left: 0px;
+  padding: 20px;
+  padding-top: 24px;
+}
+
+.logs-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.logs-subtitle {
+  font-size: 16px;
+  font-weight: normal;
+  color: #9CA3AF;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.logs-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #374151;
+  margin-bottom: 24px;
+}
+
+.logs-tab {
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #4B5563;
+  color: #9CA3AF;
+  border: none;
+}
+
+.logs-tab:hover {
+  color: #E5E7EB;
+  background: #6B7280;
+}
+
+.logs-tab-active {
+  background: #F59E0B !important;
+  color: #000 !important;
+}
+
+.logs-content {
+  width: 100%;
+}
+
+.logs-panel {
+  padding: 20px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #1F2937;
+  color: #fff;
+}
+
+.logs-placeholder {
+  color: #E5E7EB;
+  font-size: 16px;
+  padding: 20px 0;
+  display: block;
 }
 
 .logs-header {
@@ -409,6 +476,99 @@
   background: #4B5563;
 }
 
+/* Shared Dropdown Styles */
+.dropdown-base {
+  position: absolute;
+  background: #2d3748;
+  border: 1px solid #4a5568;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  min-width: 160px;
+}
+
+.dropdown-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  color: #e2e8f0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.dropdown-option:hover:not(.disabled) {
+  background: #4a5568;
+}
+
+.dropdown-option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  color: #a0aec0;
+}
+
+.dropdown-option:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.dropdown-option:last-child {
+  border-radius: 0 0 6px 6px;
+}
+
+/* Shared Button System */
+.btn-base {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: #374151;
+  color: #D1D5DB;
+}
+
+.btn-primary:hover:not(.disabled) {
+  background: #4B5563;
+}
+
+.btn-success {
+  background: #38a169;
+  color: white;
+  border-color: #2f855a;
+}
+
+.btn-success:hover:not(.disabled) {
+  background: #2f855a;
+  transform: translateY(-1px);
+}
+
+.btn-menu {
+  background: #2d3748;
+  color: white;
+  border-color: #4a5568;
+}
+
+.btn-menu:hover:not(.disabled) {
+  background: #4a5568;
+}
+
+.btn-disabled, .btn-base.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Legacy button styles (to be phased out) */
+
+/* Legacy dropdown styles (to be phased out) */
 .logs-dropdown {
   position: absolute;
   right: 0;
@@ -959,82 +1119,6 @@
   white-space: pre-wrap;
 }
 
-/* LogsScreen Custom Styles */
-.logs-container {
-  min-height: 100vh;
-  width: 100%;
-  max-width: 1024px;
-  margin: 0 auto;
-  margin-left: 0px;
-  padding: 10px;
-  padding-top: 24px;
-}
-
-.logs-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 24px;
-  display: block;
-}
-
-.logs-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #374151;
-  margin-bottom: 24px;
-}
-
-.logs-tab {
-  padding: 12px 16px;
-  text-align: center;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: #4B5563;
-  color: #9CA3AF;
-  border: none;
-}
-
-.logs-tab:hover {
-  color: #E5E7EB;
-  background: #6B7280;
-}
-
-.logs-tab-active {
-  background: #F59E0B !important;
-  color: #000 !important;
-}
-
-.logs-content {
-  width: 100%;
-}
-
-.logs-panel {
-  padding: 20px;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  background: #1F2937;
-  color: #fff;
-}
-
-.logs-subtitle {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 0px;
-  display: block;
-}
-
-.logs-placeholder {
-  color: #E5E7EB;
-  font-size: 16px;
-  padding: 20px 0;
-  display: block;
-}
-
 /* TrustLogsComp Styles */
 .trust-logs-container {
   width: 100%;
@@ -1456,4 +1540,85 @@
 
 .connected-ips-api-url {
   font-family: monospace;
+}
+
+/* === UserDataScreen Styles === */
+.user-data-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.user-data-menu-button {
+  background: #2d3748;
+  color: white;
+  border: 1px solid #4a5568;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.user-data-menu-button:hover {
+  background: #4a5568;
+}
+
+.user-data-dropdown {
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+}
+
+.user-data-trust-score {
+  font-weight: bold;
+  color: #48bb78 !important;
+  font-family: 'Courier New', monospace;
+}
+
+.user-data-trust-score-large {
+  font-weight: bold;
+  color: #48bb78 !important;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+}
+
+.user-data-verify-button {
+  background: #38a169;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.user-data-verify-button:hover:not(.disabled) {
+  background: #2f855a;
+  transform: translateY(-1px);
+}
+
+.user-data-verify-button.disabled {
+  background: #68d391;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.user-data-api-info {
+  margin-top: 16px;
+  padding: 8px;
+  background: #1a202c;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #a0aec0;
+  border: 1px solid #2d3748;
+}
+
+.user-data-api-url {
+  font-family: 'Courier New', monospace;
+  color: #63b3ed;
+  background: #2a4a6b;
+  padding: 2px 4px;
+  border-radius: 2px;
 }

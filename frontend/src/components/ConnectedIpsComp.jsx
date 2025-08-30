@@ -282,12 +282,6 @@ export default function ConnectedIpsComp() {
         </view>
       </view>
 
-      {/* API hint */}
-      <view className="connected-ips-api-info">
-        <text>API: </text>
-        <text className="connected-ips-api-url">{API_BASE}/ip/current_connected_ips</text>
-      </view>
-
       {/* Detail Modal */}
       {showDetail && selectedRow && (
         <view className="logs-modal-overlay" bindtap={() => setShowDetail(false)}>

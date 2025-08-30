@@ -160,7 +160,7 @@ export default function IpLogsComp() {
     <view className="logs-container">
       {/* Title row */}
       <view className="logs-header">
-        <text className="logs-subtitle">IP Access Logs</text>
+        <text className="logs-title">IP Access Logs</text>
       </view>
 
       {/* Controls row */}

@@ -121,7 +121,7 @@ export default function TrustLogsComp() {
     <view className="logs-container">
       {/* Title row */}
       <view className="logs-header">
-        <text className="logs-subtitle">Trust Activity Logs</text>
+        <text className="logs-title">Trust Activity Logs</text>
       </view>
 
       {/* Controls row */}
