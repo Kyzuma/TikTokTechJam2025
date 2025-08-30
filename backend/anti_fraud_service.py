@@ -19,8 +19,26 @@ load_dotenv()
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
+
 app = Flask(__name__)
-Swagger(app)
+
+# Flasgger Swagger UI top section customization
+swagger_template = {
+  "swagger": "2.0",
+  "info": {
+    "title": "TikTok TechJam Anti-Fraud API",
+    "description": "API for anti-fraud monitoring, user trust, and transaction security. Powered by Flasgger.",
+    "version": "0.0.1",
+    "license": {
+      "name": "MIT",
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/",
+  "schemes": ["http"],
+}
+
+Swagger(app, template=swagger_template)
 CORS(app)
 geo_reader = geoip2.database.Reader("backend\GeoLite2-City.mmdb")
 
