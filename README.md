@@ -28,15 +28,14 @@ A content moderation and anti-fraud platform for social media platforms.
    ```bash
    git clone https://github.com/your-username/ValueTok.git
    cd ValueTok/backend
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   brew
+   pip3 install -r requirements.txt
    ```
 
 2. **Setup frontend**
    ```bash
-   cd ../frontend
+   cd frontend
    npm install
    ```
 
@@ -50,27 +49,31 @@ A content moderation and anti-fraud platform for social media platforms.
    ```
 
 4. **Configure API_BASE**
+
+   Find your IP: 
+
+   `ifconfig` (macOS/Linux) -> under en0 -> inet
+
+   `ipconfig` (Windows) -> under IPv4 Address
    
    Update `frontend/src/App.jsx`:
    ```javascript
-   export const API_BASE = "http://YOUR_LOCAL_IP:8080"; // Change to your machine's IP
+   export const API_BASE = "http://YOUR_LOCAL_IP:8080";
    ```
-   
-   Find your IP: `ifconfig` (macOS/Linux) or `ipconfig` (Windows)
-
-5. **Download GeoLite2 database**
-   - Download from MaxMind (free account required)
-   - Place `GeoLite2-City.mmdb` in `backend/` directory
+   Update `UploadScreen.jsx`:
+   ``` javascript
+   const API_BASE = "http://YOUR_LOCAL_IP:8081";
+   ```
 
 ## 🏃‍♂️ Run Locally
 
 1. **Start backend services**
    ```bash
-   # Terminal 1 - Main API
+   # Terminal 1 - Anti Fraud API
    cd backend
-   python app.py
+   python anti_fraud_service.py
    
-   # Terminal 2 - Content evaluation
+   # Terminal 2 - Content Evaluation API
    cd backend/content_evaluation
    python app.py
    ```
@@ -81,6 +84,8 @@ A content moderation and anti-fraud platform for social media platforms.
    cd frontend
    npm run dev
    ```
+   Download Lynx Explorer or use an android emulator!
+
    Scan QR code with your phone to test
 
 ## 📁 Project Structure
@@ -97,14 +102,6 @@ ValueTok/
         ├── components/
         └── screens/
 ```
-
-## 🔧 API Endpoints
-
-- `GET /` - API status
-- `POST /checkContent` - Analyze video content
-- `POST /ipcheck` - Check IP for fraud
-- `POST /transaction` - Analyze transactions
-
 ---
 
 *ValueTok - Protecting digital communities through intelligent content moderation*
