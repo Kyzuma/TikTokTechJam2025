@@ -12,10 +12,6 @@ from adapters import AutoAdapterModel
 
 whisper_model = whisper.load_model("base")  
 
-# Load HateBERT model
-filter_model = AutoAdapterModel.from_pretrained("GroNLP/hateBERT", local_files_only=True)
-filter_tokenizer = AutoTokenizer.from_pretrained("GroNLP/hateBERT", local_files_only=True)
-
 # Load environment variables
 load_dotenv()
 
@@ -108,4 +104,4 @@ def flagged():
 
 if __name__ == '__main__':
     # Run the app in debug mode for development
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from '@lynx-js/react'
 import './App.css'
 
 // User Screens
-// TBC
+import { CreatorDashBoardScreen } from './screens/CreatorDashBoardScreen'
+import { UploadScreen } from './screens/UploadScreen'
 
 // Admin Screens
 import { AdminDashboardScreen } from './screens/AdminDashboardScreen'
@@ -32,14 +33,12 @@ export function App() {
       }
     } else {
       switch(activeTab) {
-        case 'Dashboard':
-          return <AdminDashboardScreen setActiveTab={setActiveTab} />
         case 'Profile':
-          return <AdminDashboardScreen/>
-        case 'Settings':
-          return <AdminDashboardScreen/>
+          return <CreatorDashBoardScreen />
+        case 'Upload':
+          return <UploadScreen />
         default:
-          return <AdminDashboardScreen setActiveTab={setActiveTab} />
+          return <CreatorDashBoardScreen />
       }
     }
   }
@@ -100,13 +99,6 @@ export function App() {
         ) : (
           <>
             <view 
-              className={`TabItem ${activeTab === 'Dashboard' ? 'active' : ''}`}
-              bindtap={() => setActiveTab('Dashboard')}
-            >
-              <text className="TabIcon">🏠</text>
-              <text className="TabLabel">Dashboard</text>
-            </view>
-            <view 
               className={`TabItem ${activeTab === 'Profile' ? 'active' : ''}`}
               bindtap={() => setActiveTab('Profile')}
             >
@@ -114,11 +106,11 @@ export function App() {
               <text className="TabLabel">Profile</text>
             </view>
             <view 
-              className={`TabItem ${activeTab === 'Settings' ? 'active' : ''}`}
-              bindtap={() => setActiveTab('Settings')}
+              className={`TabItem ${activeTab === 'Upload' ? 'active' : ''}`}
+              bindtap={() => setActiveTab('Upload')}
             >
-              <text className="TabIcon">⚙️</text>
-              <text className="TabLabel">Settings</text>
+              <text className="TabIcon">⬆️</text>
+              <text className="TabLabel">Upload</text>
             </view>
           </>
         )}
