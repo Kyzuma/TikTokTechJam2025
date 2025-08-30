@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from '@lynx-js/react'
 
 import './App.css'
+
 // User Screens
-import { UserDashboardScreen } from './screens/UserDashboardScreen'
-import { UserProfileScreen } from './screens/UserProfileScreen'
-import { UserSettingsScreen } from './screens/UserSettingsScreen'
+// TBC
+
 // Admin Screens
 import { AdminDashboardScreen } from './screens/AdminDashboardScreen'
-import { AdminUsersScreen } from './screens/AdminUsersScreen'
-import { AdminReportsScreen } from './screens/AdminReportsScreen'
-
+import { TransactionsScreen } from './screens/TransactionsScreen'
+import { LogsScreen } from './screens/LogsScreen'
+import { UserDataScreen } from './screens/UserDataScreen'
 
 export function App() {
   // State for navigation and role
@@ -19,25 +19,25 @@ export function App() {
   const renderScreen = () => {
     if (userRole === 'admin') {
       switch(activeTab) {
-        case 'Dashboard':
-          return <AdminDashboardScreen />
+        case 'Transactions':
+          return <TransactionsScreen />
+        case 'Logs':
+          return <LogsScreen />
         case 'Users':
-          return <AdminUsersScreen />
-        case 'Reports':
-          return <AdminReportsScreen />
+          return <UserDataScreen />
         default:
-          return <AdminDashboardScreen />
+          return <AdminDashboardScreen setActiveTab={setActiveTab} />
       }
     } else {
       switch(activeTab) {
         case 'Dashboard':
-          return <UserDashboardScreen />
+          return <AdminDashboardScreen setActiveTab={setActiveTab} />
         case 'Profile':
-          return <UserProfileScreen />
+          return <AdminDashboardScreen/>
         case 'Settings':
-          return <UserSettingsScreen />
+          return <AdminDashboardScreen/>
         default:
-          return <UserDashboardScreen />
+          return <AdminDashboardScreen setActiveTab={setActiveTab} />
       }
     }
   }
@@ -53,7 +53,7 @@ export function App() {
       {/* Role Toggle Button */}
       <view className="RoleToggle">
         <text className="RoleToggleButton" bindtap={toggleRole}>
-          {userRole === 'user' ? '⚙️ Admin' : '👤 User'}
+          {userRole === 'user' ? '⚙️ Swap to Admin' : '👤 Swap to User'}
         </text>
       </view>
       
@@ -66,45 +66,51 @@ export function App() {
       <view className="TabBar">
         {userRole === 'admin' ? (
           <>
-            <text 
-              className={`TabItem ${activeTab === 'Dashboard' ? 'active' : ''}`}
-              bindtap={() => setActiveTab('Dashboard')}
+            <view 
+              className={`TabItem ${activeTab === 'Transactions' ? 'active' : ''}`}
+              bindtap={() => setActiveTab('Transactions')}
             >
-              Dashboard
-            </text>
-            <text 
+              <text className="TabIcon">💳</text>
+              <text className="TabLabel">Transactions</text>
+            </view>
+            <view 
+              className={`TabItem ${activeTab === 'Logs' ? 'active' : ''}`}
+              bindtap={() => setActiveTab('Logs')}
+            >
+              <text className="TabIcon">📜</text>
+              <text className="TabLabel">Logs</text>
+            </view>
+            <view 
               className={`TabItem ${activeTab === 'Users' ? 'active' : ''}`}
               bindtap={() => setActiveTab('Users')}
             >
-              Users
-            </text>
-            <text 
-              className={`TabItem ${activeTab === 'Reports' ? 'active' : ''}`}
-              bindtap={() => setActiveTab('Reports')}
-            >
-              Reports
-            </text>
+              <text className="TabIcon">👤</text>
+              <text className="TabLabel">Manage Users</text>
+            </view>
           </>
         ) : (
           <>
-            <text 
+            <view 
               className={`TabItem ${activeTab === 'Dashboard' ? 'active' : ''}`}
               bindtap={() => setActiveTab('Dashboard')}
             >
-              Dashboard
-            </text>
-            <text 
+              <text className="TabIcon">🏠</text>
+              <text className="TabLabel">Dashboard</text>
+            </view>
+            <view 
               className={`TabItem ${activeTab === 'Profile' ? 'active' : ''}`}
               bindtap={() => setActiveTab('Profile')}
             >
-              Profile
-            </text>
-            <text 
+              <text className="TabIcon">👤</text>
+              <text className="TabLabel">Profile</text>
+            </view>
+            <view 
               className={`TabItem ${activeTab === 'Settings' ? 'active' : ''}`}
               bindtap={() => setActiveTab('Settings')}
             >
-              Settings
-            </text>
+              <text className="TabIcon">⚙️</text>
+              <text className="TabLabel">Settings</text>
+            </view>
           </>
         )}
       </view>

@@ -11,9 +11,11 @@
     "@lynx-js/react": "^0.112.4",
     "@lynx-js/tailwind-preset": "^0.2.0",
     "@lynx-js/tailwind-preset-canary": "^0.2.0",
+    "@tanstack/react-query": "^5.85.6",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "postcss-loader": "^8.1.1",
+    "recharts": "^3.1.2",
     "rsbuild-plugin-tailwindcss": "^0.2.3",
     "tailwindcss": "^3.4.17"
   },

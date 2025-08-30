@@ -3,7 +3,7 @@ from flask_cors import CORS
 from invokes import invoke_http
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for your Lynx frontend
+
 
 @app.route('/')
 def home():
