@@ -1,5 +1,6 @@
 // src/screens/LogsScreen.jsx
 import { useEffect, useMemo, useRef, useState } from "@lynx-js/react";
+import { API_BASE } from '../App';
 
 export function LogsScreen() {
   const [data, setData] = useState([]);
@@ -53,9 +54,6 @@ export function LogsScreen() {
       }
     };
   }, [success]);
-
-  const DEFAULT_BASE = "http://192.168.88.13:8080";
-  const API_BASE = DEFAULT_BASE;
 
   // Alternative simpler request method for Lynx
   const fetchDataSimple = async () => {
