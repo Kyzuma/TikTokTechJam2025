@@ -20,7 +20,7 @@ export function AdminDashboardScreen({ setActiveTab }) {
 
       <view className="ao-stack">
         {/* Transactions Widget */}
-        <view className="ao-widget" bindtap={() => handleWidgetClick('Reports')}>
+        <view className="ao-widget" bindtap={() => handleWidgetClick('Transactions')}>
           <view className="ao-left">
             <view className="ao-icon">
               <text>💳</text>
@@ -38,7 +38,7 @@ export function AdminDashboardScreen({ setActiveTab }) {
         </view>
 
         {/* Logs History Widget */}
-        <view className="ao-widget" bindtap={() => handleWidgetClick('Reports')}>
+        <view className="ao-widget" bindtap={() => handleWidgetClick('Logs')}>
           <view className="ao-left">
             <view className="ao-icon">
               <text>📜</text>

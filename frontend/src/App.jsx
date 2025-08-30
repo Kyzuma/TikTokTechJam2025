@@ -50,6 +50,13 @@ export function App() {
 
   return (
     <view className="App">
+      {/* Dashboard Button */}
+      <view className="DashboardButton">
+        <text className="DashboardButtonText" bindtap={() => setActiveTab('Dashboard')}>
+          🏠 Dashboard
+        </text>
+      </view>
+      
       {/* Role Toggle Button */}
       <view className="RoleToggle">
         <text className="RoleToggleButton" bindtap={toggleRole}>

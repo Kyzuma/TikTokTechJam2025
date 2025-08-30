@@ -1,3 +1,25 @@
+/* Dashboard Button */
+.DashboardButton {
+  position: fixed;
+  top: 60px;
+  left: 20px;
+}
+
+.DashboardButtonText {
+  background: #27AE60;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: background 0.3s;
+}
+
+.DashboardButtonText:hover {
+  background: #219A52;
+}
+
 /* Role Toggle Button */
 .RoleToggle {
   position: fixed;
@@ -437,17 +459,87 @@
   font-size: 14px;
 }
 
+.logs-picker-container {
+  position: relative;
+}
+
 .logs-picker {
   background: #374151;
   border: 1px solid #4B5563;
   border-radius: 4px;
-  padding: 6px 12px;
+  padding: 0;
   color: #fff;
+  min-width: 160px;
+  cursor: pointer;
+}
+
+.logs-picker-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  gap: 8px;
 }
 
 .logs-picker-text {
   color: #fff;
   font-size: 14px;
+  flex: 1;
+}
+
+.logs-picker-arrow {
+  color: #9CA3AF;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.logs-picker:hover .logs-picker-arrow {
+  transform: rotate(180deg);
+}
+
+.logs-picker:hover {
+  background: #4B5563;
+}
+
+.logs-filter-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+.logs-filter-option {
+  display: block;
+  padding: 8px 12px;
+  color: #E5E7EB;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #4B5563;
+}
+
+.logs-filter-option:last-child {
+  border-bottom: none;
+}
+
+.logs-filter-option:hover {
+  background: #4B5563;
+}
+
+.logs-filter-option.active {
+  background: #1D4ED8;
+  color: #fff;
+}
+
+.logs-filter-option.active:hover {
+  background: #2563EB;
 }
 
 .logs-search {
@@ -859,4 +951,408 @@
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.6;
+}
+
+/* LogsScreen Custom Styles */
+.logs-container {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.logs-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.logs-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #374151;
+  margin-bottom: 24px;
+}
+
+.logs-tab {
+  padding: 12px 16px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #4B5563;
+  color: #9CA3AF;
+  border: none;
+}
+
+.logs-tab:hover {
+  color: #E5E7EB;
+  background: #6B7280;
+}
+
+.logs-tab-active {
+  background: #F59E0B !important;
+  color: #000 !important;
+}
+
+.logs-content {
+  width: 100%;
+}
+
+.logs-panel {
+  padding: 20px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #1F2937;
+  color: #fff;
+}
+
+.logs-subtitle {
+  color: #9CA3AF;
+  margin-bottom: 12px;
+  display: block;
+  font-size: 14px;
+}
+
+.logs-placeholder {
+  color: #E5E7EB;
+  font-size: 16px;
+  padding: 20px 0;
+  display: block;
+}
+
+/* TrustLogsComp Styles */
+.trust-logs-container {
+  width: 100%;
+}
+
+.trust-logs-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.trust-logs-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trust-logs-search-input {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  width: 300px;
+  background: #1F2937;
+  color: #fff;
+}
+
+.trust-logs-sort-button {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  background: #374151;
+  color: #D1D5DB;
+  transition: background 0.3s;
+}
+
+.trust-logs-sort-button:hover {
+  background: #4B5563;
+}
+
+.trust-logs-error {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #EF4444;
+  border: 1px solid #DC2626;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.trust-logs-loading {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #9CA3AF;
+}
+
+.trust-logs-table-container {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  background: #1F2937;
+}
+
+.trust-logs-table {
+  min-width: 100%;
+}
+
+.trust-logs-header {
+  background: #374151;
+  display: flex;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid #4B5563;
+}
+
+.trust-logs-header-cell {
+  padding: 12px;
+  color: #D1D5DB;
+}
+
+.trust-logs-col-id { width: 100px; flex-shrink: 0; }
+.trust-logs-col-created { width: 150px; flex-shrink: 0; }
+.trust-logs-col-user { width: 100px; flex-shrink: 0; }
+.trust-logs-col-trust { width: 100px; flex-shrink: 0; }
+.trust-logs-col-remarks { width: 250px; flex-shrink: 0; }
+
+.trust-logs-row {
+  display: flex;
+  font-size: 14px;
+  border-bottom: 1px solid #374151;
+}
+
+.trust-logs-row-even {
+  background: #111827;
+}
+
+.trust-logs-cell {
+  padding: 12px;
+  color: #E5E7EB;
+}
+
+.trust-logs-mono {
+  font-family: monospace;
+}
+
+.trust-logs-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.trust-logs-positive {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22C55E;
+  border: 1px solid #22C55E;
+}
+
+.trust-logs-negative {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+  border: 1px solid #EF4444;
+}
+
+.trust-logs-neutral {
+  background: rgba(156, 163, 175, 0.2);
+  color: #9CA3AF;
+  border: 1px solid #9CA3AF;
+}
+
+.trust-logs-no-data {
+  padding: 20px;
+  text-align: center;
+  color: #9CA3AF;
+}
+
+.trust-logs-api-info {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #9CA3AF;
+}
+
+.trust-logs-api-url {
+  font-family: monospace;
+}
+
+/* IpLogsComp Styles */
+.ip-logs-container {
+  width: 100%;
+}
+
+.ip-logs-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ip-logs-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-logs-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-logs-label {
+  font-size: 14px;
+  color: #9CA3AF;
+}
+
+.ip-logs-picker {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+  background: #1F2937;
+  color: #fff;
+}
+
+.ip-logs-search-input {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  width: 300px;
+  background: #1F2937;
+  color: #fff;
+}
+
+.ip-logs-error {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #EF4444;
+  border: 1px solid #DC2626;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.ip-logs-loading {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #9CA3AF;
+}
+
+.ip-logs-table-container {
+  border: 1px solid #374151;
+  border-radius: 6px;
+  background: #1F2937;
+}
+
+.ip-logs-table {
+  min-width: 100%;
+}
+
+.ip-logs-header {
+  background: #374151;
+  display: flex;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid #4B5563;
+}
+
+.ip-logs-header-cell {
+  padding: 12px;
+  color: #D1D5DB;
+}
+
+.ip-logs-col-id { width: 70px; flex-shrink: 0; }
+.ip-logs-col-checked { width: 150px; flex-shrink: 0; }
+.ip-logs-col-user { width: 70px; flex-shrink: 0; }
+.ip-logs-col-ip { width: 150px; flex-shrink: 0; }
+.ip-logs-col-geo { width: 200px; flex-shrink: 0; }
+.ip-logs-col-coords { width: 150px; flex-shrink: 0; }
+.ip-logs-col-status { width: 100px; flex-shrink: 0; }
+.ip-logs-col-remarks { width: 200px; flex-shrink: 0; }
+.ip-logs-col-action { width: 100px; flex-shrink: 0; }
+
+.ip-logs-row {
+  display: flex;
+  font-size: 14px;
+  border-bottom: 1px solid #374151;
+}
+
+.ip-logs-row-even {
+  background: #111827;
+}
+
+.ip-logs-cell {
+  padding: 12px;
+  color: #E5E7EB;
+}
+
+.ip-logs-mono {
+  font-family: monospace;
+}
+
+.ip-logs-status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.ip-logs-suspicious {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+  border: 1px solid #EF4444;
+}
+
+.ip-logs-safe {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22C55E;
+  border: 1px solid #22C55E;
+}
+
+.ip-logs-mark-safe-button {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #22C55E;
+  color: #22C55E;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.ip-logs-mark-safe-button:hover {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.ip-logs-no-action {
+  color: #6B7280;
+  font-size: 12px;
+}
+
+.ip-logs-no-data {
+  padding: 20px;
+  text-align: center;
+  color: #9CA3AF;
+}
+
+.ip-logs-api-info {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #9CA3AF;
+}
+
+.ip-logs-api-url {
+  font-family: monospace;
+}
+
+@media (min-width: 640px) {
+  .trust-logs-controls,
+  .ip-logs-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
