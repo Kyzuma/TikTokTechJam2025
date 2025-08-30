@@ -2,6 +2,7 @@ import { useState } from "@lynx-js/react";
 
 import IpLogsComp from "../components/ipLogsComp";
 import TrustLogsComp from "../components/trustLogsComp";
+import ConnectedIpsComp from "../components/ConnectedIpsComp";
 
 export function LogsScreen() {
     const [activeTab, setActiveTab] = useState("trust"); // "trust" | "ip"
@@ -25,6 +26,13 @@ export function LogsScreen() {
                 >
                     IP logs
                 </text>
+                <text
+                    bindtap={() => setActiveTab("connected")}
+                    className={`logs-tab ${activeTab === "connected" ? "logs-tab-active" : ""}`}
+                >
+                    Connected IPs
+                </text>
+                
             </view>
 
             {/* Tab Content */}
@@ -37,6 +45,11 @@ export function LogsScreen() {
                 {activeTab === "ip" && (
                     <view className="logs-panel">
                         <IpLogsComp />
+                    </view>
+                )}
+                {activeTab === "connected" && (
+                    <view className="logs-panel">
+                        <ConnectedIpsComp />
                     </view>
                 )}
             </view>
