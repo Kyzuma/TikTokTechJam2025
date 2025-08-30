@@ -1,119 +1,201 @@
-:root {
-  background-color: #000;
-  --color-text: #fff;
-}
-
-.Background {
+/* Role Toggle Button */
+.RoleToggle {
   position: fixed;
-  background: radial-gradient(
-    71.43% 62.3% at 46.43% 36.43%,
-    rgba(18, 229, 229, 0) 15%,
-    rgba(239, 155, 255, 0.3) 56.35%,
-    #ff6448 100%
-  );
-  box-shadow: 0px 12.93px 28.74px 0px #ffd28db2 inset;
-  border-radius: 50%;
-  width: 200vw;
-  height: 200vw;
-  top: -60vw;
-  left: -14.27vw;
-  transform: rotate(15.25deg);
+  top: 60px;
+  right: 20px;
+  z-index: 1001;
 }
 
+.RoleToggleButton {
+  background: #0984e3;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: background 0.3s;
+}
+
+.RoleToggleButton:hover {
+  background: #0770c2;
+}
+
+/* Bottom Tab Bar */
+.TabBar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 64px;
+  background: #23272f;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  border-top: 1px solid #444;
+}
+
+.TabItem {
+  color: #888;
+  font-size: 18px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.TabItem.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.TabItem:hover {
+  color: #ccc;
+}
+
+/* Screen Styles */
+.Screen {
+  padding: 20px;
+  min-height: calc(100vh - 128px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ScreenTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.ScreenContent {
+  font-size: 16px;
+  color: #ccc;
+  text-align: center;
+}
+.TabBar {
+  position: fixed;
+  left: 0;
+  bottom: 15;
+  width: 100vw;
+  height: 64px;
+  background: #23272f;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+}
+.TabItem {
+  color: #fff;
+  font-size: 18px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+/* Base Styles */
 .App {
-  position: relative;
+  flex-direction: column;
   min-height: 100vh;
+  background: #23272f;
+}
+
+.NavBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 64px;
+  background: #23272f;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  padding: 16px 24px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+.PlaceHolder {
+  height: 64px; /* Height of the fixed navbar */
 }
 
-text {
-  color: var(--color-text);
-}
-
-.Banner {
-  flex: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.Logo {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-.Logo--react {
-  width: 100px;
-  height: 100px;
-  animation: Logo--spin infinite 20s linear;
-}
-
-.Logo--lynx {
-  width: 100px;
-  height: 100px;
-  animation: Logo--shake infinite 0.5s ease;
-}
-
-@keyframes Logo--spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes Logo--shake {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.Content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.Arrow {
-  width: 24px;
-  height: 24px;
-}
-
-.Title {
-  font-size: 36px;
-  font-weight: 700;
-}
-
-.Subtitle {
-  font-style: italic;
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.Description {
+.NavTitle {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.85);
-  margin: 15rpx;
+  font-weight: 600;
+  color: #2d3436;
 }
 
-.Hint {
-  font-size: 12px;
-  margin: 5px;
-  color: rgba(255, 255, 255, 0.65);
+.NavItems {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.NavLink {
+  color: #636e72;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.NavLink:active {
+  background: #f1f2f6;
+}
+
+/* Todo Input Section */
+.TodoInputSection {
+  flex-direction: row;
+  gap: 12px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  margin: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.TodoInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.AddButton {
+  background: #0984e3;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Todo List */
+.TodoList {
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 20px;
+}
+
+.TodoItem {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.TodoText {
+  font-size: 16px;
+  color: #2d3436;
+}
+
+.DeleteButton {
+  color: #e74c3c;
+  font-size: 24px;
+  font-weight: 300;
+  padding: 0 8px;
 }
