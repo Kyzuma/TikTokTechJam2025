@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "@lynx-js/react";
-
+import { API_BASE } from "../App";
 export function TransactionsScreen() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -56,8 +56,8 @@ export function TransactionsScreen() {
     };
   }, [success]);
 
-  const DEFAULT_BASE = "http://192.168.88.13:8080";
-  const API_BASE = DEFAULT_BASE;
+  // const DEFAULT_BASE = "http://192.168.88.13:8080";
+  // const API_BASE = DEFAULT_BASE;
 
   // Alternative simpler request method for Lynx
   const fetchDataSimple = async () => {
