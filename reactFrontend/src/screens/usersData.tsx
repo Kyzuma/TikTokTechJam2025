@@ -11,6 +11,13 @@ type UserProfile = {
   transaction_limit: number;
 };
 
+type VerifyResp = {
+  user_id: number;
+  new_trust: number;
+  verified: boolean;
+  message?: string;
+};
+
 const DEFAULT_BASE = "http://localhost:8080";
 const API_BASE = (import.meta as any)?.env?.VITE_API_BASE || DEFAULT_BASE;
 
@@ -23,6 +30,9 @@ export default function UsersData() {
   // search + batch
   const [search, setSearch] = useState("");
   const [batching, setBatching] = useState(false);
+
+  // per-row verify loading
+  const [verifying, setVerifying] = useState<Record<number, boolean>>({});
 
   // overflow ":" menu
   const [menuOpen, setMenuOpen] = useState(false);
@@ -79,6 +89,54 @@ export default function UsersData() {
     } finally {
       setBatching(false);
       setMenuOpen(false);
+    }
+  };
+
+  // Verify a single user
+  const verifyUser = async (userId: number) => {
+    try {
+      setError(null);
+      setSuccess(null);
+      setVerifying((v) => ({ ...v, [userId]: true }));
+
+      const res = await axios.get<VerifyResp>(`${API_BASE}/user/verify`, {
+        params: { user_id: userId },
+        headers: { Accept: "application/json" },
+      });
+
+      const { verified, new_trust } = res.data ?? {};
+      // Update the row inline
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.user_id === userId
+            ? {
+                ...u,
+                is_verified: !!verified,
+                trust_score:
+                  typeof new_trust === "number" ? new_trust : u.trust_score,
+              }
+            : u
+        )
+      );
+      setSuccess(
+        `User ${userId} ${verified ? "verified" : "status unchanged"}${
+          typeof new_trust === "number" ? ` (trust → ${new_trust})` : ""
+        }.`
+      );
+      setTimeout(() => setSuccess(null), 4000);
+    } catch (e: any) {
+      const status = e?.response?.status;
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        e?.message ||
+        "Failed to verify user";
+      setError(`Verify failed${status ? ` (${status})` : ""}: ${msg}`);
+    } finally {
+      setVerifying((v) => {
+        const { [userId]: _, ...rest } = v;
+        return rest;
+      });
     }
   };
 
@@ -156,7 +214,7 @@ export default function UsersData() {
 
       {/* Controls row (right: search only) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-        <div /> {/* left spacer to keep alignment like your other screens */}
+        <div /> {/* spacer */}
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -191,12 +249,13 @@ export default function UsersData() {
               <th className="px-3 py-2 border-b">Last IP</th>
               <th className="px-3 py-2 border-b">Trust Score</th>
               <th className="px-3 py-2 border-b">Transaction Limit</th>
+              <th className="px-3 py-2 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td className="px-3 py-3 text-gray-500" colSpan={6}>
+                <td className="px-3 py-3 text-gray-500" colSpan={7}>
                   {loading ? "Loading…" : "No user profiles found."}
                 </td>
               </tr>
@@ -222,6 +281,20 @@ export default function UsersData() {
                     {u.trust_score}
                   </td>
                   <td className="px-3 py-2 border-b">{u.transaction_limit}</td>
+                  <td className="px-3 py-2 border-b">
+                    {u.is_verified ? (
+                      <span className="text-gray-400">—</span>
+                    ) : (
+                      <button
+                        onClick={() => verifyUser(u.user_id)}
+                        disabled={!!verifying[u.user_id]}
+                        className="inline-flex items-center gap-2 rounded px-2.5 py-1.5 text-xs border bg-white hover:bg-gray-50 disabled:opacity-60"
+                        title="Verify user"
+                      >
+                        {verifying[u.user_id] ? "Verifying…" : "Verify"}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
@@ -231,8 +304,19 @@ export default function UsersData() {
 
       {/* API hints (optional) */}
       <div className="mt-3 text-[11px] text-gray-500 space-y-1">
-        <div>List: <code className="font-mono">{API_BASE}/user/user_profiles</code></div>
-        <div>Batch: <code className="font-mono">{API_BASE}/trust_log/tabulate_trust</code></div>
+        <div>
+          List: <code className="font-mono">{API_BASE}/user/user_profiles</code>
+        </div>
+        <div>
+          Verify (GET):{" "}
+          <code className="font-mono">
+            {API_BASE}/user/verify?user_id=&lt;id&gt;
+          </code>
+        </div>
+        <div>
+          Batch:{" "}
+          <code className="font-mono">{API_BASE}/trust_log/tabulate_trust</code>
+        </div>
       </div>
     </div>
   );
