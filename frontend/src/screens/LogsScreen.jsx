@@ -16,6 +16,44 @@ export function LogsScreen() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
 
+  // Auto-clear timers for banners
+  const errorTimeoutRef = useRef(null);
+  const successTimeoutRef = useRef(null);
+
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+      errorTimeoutRef.current = setTimeout(() => {
+        setError(null);
+      }, 5000);
+    }
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, [error]);
+
+  // Auto-clear success after 3 seconds
+  useEffect(() => {
+    if (success) {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+      successTimeoutRef.current = setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+    }
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, [success]);
+
   const DEFAULT_BASE = "http://192.168.88.13:8080";
   const API_BASE = DEFAULT_BASE;
 
@@ -256,12 +294,22 @@ export function LogsScreen() {
       {/* Status banners */}
       {error && (
         <view className="logs-error">
-          <text>{error}</text>
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{error}</text>
+            <text className="logs-banner-close" bindtap={() => setError(null)}>
+              ✕
+            </text>
+          </view>
         </view>
       )}
       {success && (
         <view className="logs-success">
-          <text>{success}</text>
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{success}</text>
+            <text className="logs-banner-close" bindtap={() => setSuccess(null)}>
+              ✕
+            </text>
+          </view>
         </view>
       )}
       {loading && !data.length && (
@@ -333,13 +381,6 @@ export function LogsScreen() {
             </view>
           </scroll-view>
         </view>
-      </view>
-
-      {/* API hint */}
-      <view className="logs-footer">
-        <text className="logs-api-info">
-          API: {API_BASE}/transaction/flagged_transactions
-        </text>
       </view>
 
       {/* Detail Modal */}

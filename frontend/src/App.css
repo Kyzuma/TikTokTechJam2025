@@ -475,6 +475,7 @@
   border-radius: 6px;
   padding: 12px 16px;
   margin-bottom: 16px;
+  animation: slideInDown 0.3s ease-out;
 }
 
 .logs-error text {
@@ -488,11 +489,59 @@
   border-radius: 6px;
   padding: 12px 16px;
   margin-bottom: 16px;
+  animation: slideInDown 0.3s ease-out;
 }
 
 .logs-success text {
   color: #86EFAC;
   font-size: 14px;
+}
+
+.logs-banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.logs-banner-text {
+  flex: 1;
+}
+
+.logs-banner-close {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  min-width: 20px;
+  text-align: center;
+}
+
+.logs-banner-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 .logs-loading {
