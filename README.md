@@ -8,16 +8,30 @@ A content moderation and anti-fraud platform for social media platforms.
 - Python 3.9+
 - Node.js 18+
 - Git
+- FFmpeg (for video processing)
 
 ### Installation
 
-1. **Clone and setup backend**
+1. **Install FFmpeg**
+   ```bash
+   # macOS (using Homebrew)
+   brew install ffmpeg
+   
+   # Ubuntu/Debian
+   sudo apt update && sudo apt install ffmpeg
+   
+   # Windows (using Chocolatey)
+   choco install ffmpeg
+   ```
+
+2. **Clone and setup backend**
    ```bash
    git clone https://github.com/your-username/ValueTok.git
    cd ValueTok/backend
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
+   brew
    ```
 
 2. **Setup frontend**
