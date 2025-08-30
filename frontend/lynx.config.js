@@ -1,31 +1,21 @@
-import { defineConfig } from '@lynx-js/rspeedy';
-import { pluginQRCode } from '@lynx-js/qrcode-rsbuild-plugin';
-import { pluginReactLynx } from '@lynx-js/react-rsbuild-plugin';
+import { defineConfig } from '@lynx-js/rspeedy'
+
+import { pluginQRCode } from '@lynx-js/qrcode-rsbuild-plugin'
+import { pluginReactLynx } from '@lynx-js/react-rsbuild-plugin'
+import { pluginTailwindCSS } from 'rsbuild-plugin-tailwindcss'; // Import this
 
 export default defineConfig({
-  // Root default: if no env is selected, use lynx entry (prevents index.js fallback)
   source: {
-    entry: { index: './src/index.lynx.jsx' },
+    entry: './src/index.jsx',
   },
   plugins: [
     pluginQRCode({
       schema(url) {
-        return `${url}?fullscreen=true`;
+        // We use `?fullscreen=true` to open the page in LynxExplorer in full screen mode
+        return `${url}?fullscreen=true`
       },
     }),
     pluginReactLynx(),
+    pluginTailwindCSS(),
   ],
-  environments: {
-    web: {
-      source: {
-        entry: { index: './src/index.web.jsx' },
-      },
-      output: { assetPrefix: '/' },
-    },
-    lynx: {
-      source: {
-        entry: { index: './src/index.lynx.jsx' },
-      },
-    },
-  },
-});
+})
