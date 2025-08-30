@@ -17,8 +17,8 @@ load_dotenv()
 whisper_model = whisper.load_model("base")  
 
 # Load HateBERT model
-filter_model = AutoAdapterModel.from_pretrained("GroNLP/hateBERT", local_files_only=True)
-filter_tokenizer = AutoTokenizer.from_pretrained("GroNLP/hateBERT", local_files_only=True)
+filter_model = AutoAdapterModel.from_pretrained("GroNLP/hateBERT")
+filter_tokenizer = AutoTokenizer.from_pretrained("GroNLP/hateBERT")
 
 # Initialize Gemini model
 gemini = ChatGoogleGenerativeAI(
