@@ -9,15 +9,15 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
-from supabase import create_client, Client
 
 load_dotenv()
 
 # Initialize Whisper model
 whisper_model = whisper.load_model("base")  
 
-# Load environment variables
-load_dotenv()
+# Load HateBERT model
+filter_model = AutoAdapterModel.from_pretrained("GroNLP/hateBERT")
+filter_tokenizer = AutoTokenizer.from_pretrained("GroNLP/hateBERT")
 
 # Initialize Gemini model
 gemini = ChatGoogleGenerativeAI(
@@ -116,4 +116,4 @@ def flagged():
 
 if __name__ == '__main__':
     # Run the app in debug mode for development
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5000)

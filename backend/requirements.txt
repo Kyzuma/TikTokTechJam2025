@@ -13,4 +13,3 @@ adapters
 torch
 datasets
 requests
-ffmpeg
