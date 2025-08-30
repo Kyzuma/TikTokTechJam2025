@@ -96,10 +96,7 @@ def getLabelsScores(transcript, filter_model, filter_tokenizer, gemini_model, ha
             hate_score = llm_scores["hate"] * hate_weight
         else:
             # Use adapter confidence for hate label (0)
-            print(all_confidences)
-            print(probs[0, 0].item())
             hate_score = probs[0, 0].item() * hate_weight
-            print(hate_score)
 
         # Get Mental Health Score
         filter_model.set_active_adapters("mh_task")

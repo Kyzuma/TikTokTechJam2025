@@ -9,7 +9,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
+from supabase import create_client, Client
 
+load_dotenv()
+
+# Initialize Whisper model
 whisper_model = whisper.load_model("base")  
 
 # Load environment variables
@@ -32,18 +36,26 @@ def health_check():
     """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.utcnow.isoformat(),
     })
-@app.route('/checkContent', methods=['GET'])
+
+@app.route('/checkContent', methods=['POST'])
 def checkContent():
     """ML prediction endpoint"""
     try:
-        # data = request.get_json()
-        # if not data:
-        #     return jsonify({'error': 'No data provided'}), 400
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        url = data.get('url')
+        if not url:
+            return jsonify({'error': 'Video URL not provided'}), 400
         
         # Get transcript
-        transcript = videoToText(whisper_model)
+        transcript = videoToText(whisper_model, url)
+        
+        if transcript is None:
+            return jsonify({'error': 'Failed to transcribe video'}), 400
 
         # Get labels and scores
         hate_mh_score = getLabelsScores(transcript, filter_model, filter_tokenizer, gemini)
@@ -92,7 +104,7 @@ def flagged():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
-        # Add data to supabase pgvector table
+        # Future implementation Add data to supabase pgvector table
         # add_to_supabase(data)
 
     except Exception as e:
