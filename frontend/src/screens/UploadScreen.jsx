@@ -1,13 +1,24 @@
-import { useState } from "react";
-import { API_BASE } from "../App";
+import { useState, useEffect } from "react";
 
 export function UploadScreen() {
+  const API_BASE = "http://192.168.88.13:8081";
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  // Auto-clear error messages
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const analyzeVideo = async () => {
+
+    console.log("Analyzing video:", videoUrl);
+
     if (!videoUrl.trim()) {
       setError("Please enter a video URL");
       return;
@@ -18,25 +29,51 @@ export function UploadScreen() {
     setResult(null);
 
     try {
-      const response = await fetch(`${API_BASE}/analyze-video`, {
-        method: 'POST',
+      console.log("Making request to:", `${API_BASE}/checkContent`);
+      console.log("Request payload:", { url: videoUrl });
+      
+      const response = await fetch(`${API_BASE}/checkContent`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          video_url: videoUrl
-        })
+          url: videoUrl,
+        }),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error("Error response body:", errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log("Response data:", data);
       setResult(data);
     } catch (err) {
-      console.error("Analysis failed:", err);
-      setError(`Analysis failed: ${err.message}`);
+      console.error("Full error details:", err);
+      console.error("Error name:", err.name);
+      console.error("Error message:", err.message);
+      console.error("Error stack:", err.stack);
+      
+      let errorMessage = `Analysis failed: ${err.message}`;
+      
+      // More specific error messages
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        errorMessage = `Network error: Cannot connect to server at ${API_BASE}. Is the server running?`;
+      } else if (err.message.includes('CORS')) {
+        errorMessage = `CORS error: Server needs to allow requests from this domain`;
+      } else if (err.message.includes('400')) {
+        errorMessage = `Bad request: Invalid video URL or request format`;
+      } else if (err.message.includes('500')) {
+        errorMessage = `Server error: Something went wrong on the server side`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -47,7 +84,8 @@ export function UploadScreen() {
     setResult({
       message: "Quality score is low",
       score: 23.6,
-      summary: "The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language (\"fucking,\" \"bitch,\" \"bastard\"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content. The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language (\"fucking,\" \"bitch,\" \"bastard\"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content. The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language (\"fucking,\" \"bitch,\" \"bastard\"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content."
+      summary:
+        'The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language ("fucking," "bitch," "bastard"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content. The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language ("fucking," "bitch," "bastard"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content. The high hate speech/mental health score (0.95) is due to the profuse use of profane and abusive language ("fucking," "bitch," "bastard"). The low clickbait score (0.0) indicates the transcript lacks sensationalism or attention-grabbing tactics. The low quality score suggests poor language and overall content.',
     });
   };
 
@@ -64,11 +102,13 @@ export function UploadScreen() {
   };
 
   return (
-      <scroll-view
-        className="creator-scroll-container"
-        scroll-y="true"
-        style="height: calc(100vh - 120px);"
-      >      {/* Loading Overlay */}
+    <scroll-view
+      className="creator-scroll-container"
+      scroll-y="true"
+      style="height: calc(100vh - 120px);"
+    >
+      {" "}
+      {/* Loading Overlay */}
       {loading && (
         <view className="loading-overlay">
           <view className="loading-content">
@@ -76,7 +116,9 @@ export function UploadScreen() {
               <text className="loading-icon">🔍</text>
             </view>
             <text className="loading-title">Analyzing Video Content</text>
-            <text className="loading-subtitle">Processing audio and visual elements...</text>
+            <text className="loading-subtitle">
+              Processing audio and visual elements...
+            </text>
             <view className="loading-progress">
               <view className="loading-progress-bar"></view>
             </view>
@@ -84,19 +126,24 @@ export function UploadScreen() {
           </view>
         </view>
       )}
-
       {/* Page Title */}
       <view>
         <text className="ao-label">VIDEO CONTENT ANALYZER</text>
       </view>
-
       {/* Error banner */}
-      {error && <view className="analysis-error-widget">
-        <view className="analysis-error-content">
-          <text className="analysis-error-text">❌ {error}</text>
+      {error && (
+        <view className="logs-error">
+          <view className="logs-banner-content">
+            <text className="logs-banner-text">{error}</text>
+            <text
+              className="logs-banner-close"
+              bindtap={() => setError(null)}
+            >
+              ✕
+            </text>
+          </view>
         </view>
-      </view>}
-
+      )}
       {/* Analysis Form */}
       <view className="ao-stack">
         {/* Video URL input */}
@@ -104,21 +151,30 @@ export function UploadScreen() {
           <view className="ao-left">
             <view>
               <text className="ao-title">Video URL</text>
-              <input
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://example.com/video.mp4"
-                className="upload-input"
-              />
-              <text className="ao-sub">Enter a direct link to the video file</text>
+              <view className="input-container">
+                <input
+                  type="text"
+                  value={videoUrl}
+                  bindinput={(e) => {
+                    console.log("Input changed:", e.detail.value);
+                    setVideoUrl(e.detail.value);
+                  }}
+                  placeholder="https://example.com/video.mp4"
+                  className="upload-input"
+                />
+              </view>
+              <text className="ao-sub">
+                Enter a direct link to the video file
+              </text>
             </view>
           </view>
         </view>
 
         {/* Analyze button */}
-        <view 
-          className={`ao-widget upload-action-widget ${loading ? 'analysis-loading' : ''}`} 
+        <view
+          className={`ao-widget upload-action-widget ${
+            loading ? "analysis-loading" : ""
+          }`}
           bindtap={analyzeVideo}
         >
           <view className="ao-left">
@@ -130,7 +186,9 @@ export function UploadScreen() {
                 {loading ? "Analyzing Video..." : "Analyze Content"}
               </text>
               <text className="ao-sub">
-                {loading ? "Processing content quality" : "Check video quality and content"}
+                {loading
+                  ? "Processing content quality"
+                  : "Check video quality and content"}
               </text>
             </view>
           </view>
@@ -148,14 +206,17 @@ export function UploadScreen() {
                 <text className="score-card-title">Quality Assessment</text>
               </view>
               <view className="score-display">
-                <view 
+                <view
                   className="score-circle"
                   style={{ backgroundColor: getScoreColor(result.score) }}
                 >
                   <text className="score-number">{result.score}</text>
                 </view>
                 <view className="score-info">
-                  <text className="score-label" style={{ color: getScoreColor(result.score) }}>
+                  <text
+                    className="score-label"
+                    style={{ color: getScoreColor(result.score) }}
+                  >
                     {getScoreLabel(result.score)}
                   </text>
                   <text className="score-message">{result.message}</text>
@@ -178,4 +239,3 @@ export function UploadScreen() {
     </scroll-view>
   );
 }
-
