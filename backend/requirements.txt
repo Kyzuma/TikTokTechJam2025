@@ -1,6 +1,14 @@
 flask
 flask-cors
 supabase
-dotenv
+python-dotenv
 flasgger
 geoip2
+moviepy
+openai-whisper
+langchain
+langchain-google-genai
+transformers
+adapters
+torch
+datasets
